@@ -11,7 +11,7 @@ window.addEventListener('load', function () {
         constructor(game) {
             //accessible game object
             this.game = game;
-            this.radius = 75; //18:33
+            this.radius = 75;
             this.x = -this.radius; //to hide it on spawn
             this.y = Math.random() * this.game.width;
             this.image = document.getElementById('asteroid');
@@ -20,17 +20,25 @@ window.addEventListener('load', function () {
             this.speed = 1 + Math.random();
             // free to use in object pool, not animated
             this.free = true;
+            this.angle = 0;
+            this.angleChange = 0.025 - Math.random() * 0.05;
         }
         draw(context) {
             if (!this.free) {
-                context.beginPath();
-                context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                context.stroke();
+                //draw circle
+                // context.beginPath()
+                // context.arc(this.x, this.y, this.radius, 0, Math.PI *2)
+                // context.stroke()
+                context.save();
+                context.translate(this.x, this.y);
+                context.rotate(this.angle);
                 //draw source image
-                context.drawImage(this.image, this.x - this.spriteWidth / 2, this.y - this.spriteHeight / 2, this.spriteWidth, this.spriteHeight);
+                context.drawImage(this.image, 0 - this.spriteWidth / 2, 0 - this.spriteHeight / 2, this.spriteWidth, this.spriteHeight);
+                context.restore();
             }
         }
         update() {
+            this.angle += 0.001 + this.angleChange;
             if (!this.free) {
                 this.x += this.speed;
                 if (this.x > this.game.width + this.radius) {
