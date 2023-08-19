@@ -10,18 +10,30 @@ window.addEventListener('load', function() {
 
     class Asteroid {
         game: Game
+        radius: number
         x: number
         y: number
+        image: CanvasImageSource
+        spriteWidth: number
+        spriteHeight: number
+
         constructor(game:Game){
             //accessible game object
             this.game = game
+            this.radius = 75 //18:33
             this.x = Math.random()* this.game.width
             this.y = Math.random()* this.game.width
+            this.image = document.getElementById('asteroid') as CanvasImageSource
+            this.spriteWidth = 150
+            this.spriteHeight = 150
         }
+
         draw(context:CanvasRenderingContext2D){
             context.beginPath()
-            context.arc(this.x, this.y, 50, 0, Math.PI *2)
+            context.arc(this.x, this.y, this.radius, 0, Math.PI *2)
             context.stroke()
+            //draw source image
+            context.drawImage(this.image, this.x - this.spriteWidth/2, this.y - this.spriteHeight/2, this.spriteWidth, this.spriteHeight)
         }
     }
 
