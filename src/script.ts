@@ -25,18 +25,33 @@ window.addEventListener('load', function() {
         }
     }
 
+    //objects will be reused. Instead of being created and deleted they are just turned back to the initial state. Therefore garbage collection wont even have to happen.
     class Game {
-        width:number
-        height:number
-        asteroid:Asteroid
+        width: number
+        height: number
+        // asteroid: Asteroid
+        asteroidPool: Asteroid[]
+        maxAsteroids: number
+
         constructor(width:number, height:number){
             this.width = width
             this.height = height
-            // Asteroid(this) passes Game class to access its width and height
-            this.asteroid = new Asteroid(this)
+            this.asteroidPool = []
+            this.maxAsteroids = 10 //can by a dynamic value
+            this.createAsteroidPool()
         }
+        //a pool of active and inactiev objects
+        createAsteroidPool() {
+            for (let i = 0; i < this.maxAsteroids; i++) {
+                this.asteroidPool.push(new Asteroid(this))
+            }
+        }
+
         render(context:CanvasRenderingContext2D){
-            this.asteroid.draw(context)
+            this.asteroidPool.forEach( asteroid =>
+                asteroid.draw(context)
+            )
+            // this.asteroid.draw(context)
         }
     }
 
