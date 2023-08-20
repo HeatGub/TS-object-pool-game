@@ -5,6 +5,8 @@ window.addEventListener('load', function() {
     canvas.height = 800
     ctx.strokeStyle = 'green'
     ctx.lineWidth = 3
+    ctx.font = '20px helvetica'
+    ctx.fillStyle = 'orange'
 
     class Asteroid {
         game: Game
@@ -38,9 +40,9 @@ window.addEventListener('load', function() {
         draw(context:CanvasRenderingContext2D){
             if (!this.free){
                 // draw circle
-                context.beginPath()
-                context.arc(this.x, this.y, this.radius, 0, Math.PI *2)
-                context.stroke()
+                // context.beginPath()
+                // context.arc(this.x, this.y, this.radius, 0, Math.PI *2)
+                // context.stroke()
 
                 context.save()
                 context.translate(this.x, this.y)
@@ -153,6 +155,8 @@ window.addEventListener('load', function() {
         maxExplosions: number
         mouse: {x:number, y:number, radius:number}
         // explosion: Explosion
+        score: number
+        maxScore: number
 
         constructor(width:number, height:number){
             this.width = width
@@ -165,6 +169,8 @@ window.addEventListener('load', function() {
             this.explosionPool = []
             this.maxExplosions = 30 //can by a dynamic value
             this.createExplosionPool()
+            this.score = 0
+            this.maxScore = 3
 
             this.mouse = {
                 x: 0,
@@ -184,6 +190,9 @@ window.addEventListener('load', function() {
                         if (explosion) {
                             explosion.start(asteroid.x, asteroid.y)
                             asteroid.reset()
+                            if(this.score < this.maxScore){
+                                this.score++
+                            }
                         }
                     }
                 })
@@ -246,7 +255,13 @@ window.addEventListener('load', function() {
                 explosion.draw(context)
                 explosion.update(deltaTime)
             })
-            // this.asteroid.draw(context)
+            context.fillText('Scoree: ' + this.score, 20, 30)
+            if (this.score >= this.maxScore){
+                context.save()
+                context.textAlign = 'center'
+                context.fillText('WON! score: ' + this.score, this.width/2, this.height/2)
+                context.restore()
+            }
         }
     }
 
