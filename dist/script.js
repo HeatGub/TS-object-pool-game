@@ -46,7 +46,7 @@ window.addEventListener('load', function () {
                     this.reset();
                     const explosion = this.game.getExplosion();
                     if (explosion) {
-                        explosion.start(this.x, this.y);
+                        explosion.start(this.x, this.y, this.speed * -0.2);
                     }
                 }
             }
@@ -84,6 +84,7 @@ window.addEventListener('load', function () {
         }
         update(deltaTime) {
             if (!this.free) {
+                this.x += this.speed;
                 if (this.animationTimer > this.animationInterval) {
                     this.frameX++;
                     if (this.frameX > this.maxFrame) {
@@ -99,12 +100,13 @@ window.addEventListener('load', function () {
         reset() {
             this.free = true;
         }
-        start(x, y) {
+        start(x, y, speed) {
             this.free = false;
             this.x = x;
             this.y = y;
             this.frameX = 0;
             this.frameY = 0;
+            this.speed = speed;
         }
     }
     //objects will be reused. Instead of being created and deleted they are just turned back to the initial state. Therefore garbage collection wont even have to happen.
@@ -137,7 +139,7 @@ window.addEventListener('load', function () {
                     if (!asteroid.free && this.checkCollision(asteroid, this.mouse)) {
                         const explosion = this.getExplosion();
                         if (explosion) {
-                            explosion.start(asteroid.x, asteroid.y);
+                            explosion.start(asteroid.x, asteroid.y, asteroid.speed * 0.4);
                             asteroid.reset();
                             if (this.score < this.maxScore) {
                                 this.score++;
