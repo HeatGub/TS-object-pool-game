@@ -37,10 +37,11 @@ window.addEventListener('load', function() {
 
         draw(context:CanvasRenderingContext2D){
             if (!this.free){
-                //draw circle
-                // context.beginPath()
-                // context.arc(this.x, this.y, this.radius, 0, Math.PI *2)
-                // context.stroke()
+                // draw circle
+                context.beginPath()
+                context.arc(this.x, this.y, this.radius, 0, Math.PI *2)
+                context.stroke()
+
                 context.save()
                 context.translate(this.x, this.y)
                 context.rotate(this.angle)
@@ -150,14 +151,14 @@ window.addEventListener('load', function() {
         asteroidInterval: number
         explosionPool: Explosion []
         maxExplosions: number
-        mouse: {x:number, y:number}
+        mouse: {x:number, y:number, radius:number}
         // explosion: Explosion
 
         constructor(width:number, height:number){
             this.width = width
             this.height = height
             this.asteroidPool = []
-            this.maxAsteroids = 20 //can by a dynamic value
+            this.maxAsteroids = 2 //can by a dynamic value
             this.asteroidTimer = 1 //time passing for each asteroid
             this.asteroidInterval = 1 //time limit
             this.createAsteroidPool()
@@ -167,7 +168,8 @@ window.addEventListener('load', function() {
 
             this.mouse = {
                 x: 0,
-                y: 0
+                y: 0,
+                radius: 2,
             }
 
             // Arrow function inherits 'this' keyword from the parents scope
@@ -176,10 +178,15 @@ window.addEventListener('load', function() {
             window.addEventListener('click', event => {
                 this.mouse.x = event.offsetX
                 this.mouse.y = event.offsetY
-                const explosion = this.getExplosion()
-                if (explosion) {
-                    explosion.start(this.mouse.x, this.mouse.y)
-                }
+                this.asteroidPool.forEach(asteroid => {
+                    if (!asteroid.free && this.checkCollision(asteroid, this.mouse)){
+                        const explosion = this.getExplosion()
+                        if (explosion) {
+                            explosion.start(asteroid.x, asteroid.y)
+                            asteroid.reset()
+                        }
+                    }
+                })
             })
         }
         //a pool of active and inactiev objects
@@ -211,6 +218,14 @@ window.addEventListener('load', function() {
                 }
             }
             return //silences TS empty code paths error
+        }
+        //between circles
+        checkCollision(a:Asteroid,b:any){
+            const sumOfRadii = a.radius + b.radius
+            const dx = a.x - b.x
+            const dy = a.y - b.y
+            const distance = Math.hypot(dx, dy) // hypot returns the square root of the sum of squares of its arguments.
+            return distance < sumOfRadii //return false or true
         }
 
         render(context:CanvasRenderingContext2D, deltaTime:number){
