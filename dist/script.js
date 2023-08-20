@@ -75,6 +75,7 @@ window.addEventListener('load', function () {
             this.maxFrame = 22;
             this.animationTimer = 0;
             this.animationInterval = 1000 / 25; //1000/70 -> about 60FPS of explo animation
+            this.sound = this.game.explosionSound;
         }
         draw(context) {
             if (!this.free) {
@@ -97,6 +98,10 @@ window.addEventListener('load', function () {
                 }
             }
         }
+        play() {
+            this.sound.currentTime = 0;
+            this.sound.play();
+        }
         reset() {
             this.free = true;
         }
@@ -107,6 +112,7 @@ window.addEventListener('load', function () {
             this.frameX = 0;
             this.frameY = 0;
             this.speed = speed;
+            this.play();
         }
     }
     //objects will be reused. Instead of being created and deleted they are just turned back to the initial state. Therefore garbage collection wont even have to happen.
@@ -118,17 +124,20 @@ window.addEventListener('load', function () {
             this.maxAsteroids = 2; //can by a dynamic value
             this.asteroidTimer = 1; //time passing for each asteroid
             this.asteroidInterval = 1; //time limit
-            this.createAsteroidPool();
             this.explosionPool = [];
-            this.maxExplosions = 30; //can by a dynamic value
-            this.createExplosionPool();
+            this.maxExplosions = 9; //can by a dynamic value
             this.score = 0;
-            this.maxScore = 3;
+            this.maxScore = 10;
             this.mouse = {
                 x: 0,
                 y: 0,
                 radius: 2,
             };
+            this.explosionSound = document.getElementById('explosion5');
+            this.explosionSound.volume = 0.2; // volume lowered
+            this.createAsteroidPool();
+            this.createExplosionPool();
+            // console.log('this.explosionSound ' + this.explosionSound)
             // Arrow function inherits 'this' keyword from the parents scope
             // 'this' will be inherited from a class it was defined in. 
             // In this case it will point to a main game object and will have its methods
@@ -203,11 +212,11 @@ window.addEventListener('load', function () {
                 explosion.draw(context);
                 explosion.update(deltaTime);
             });
-            context.fillText('Scoree: ' + this.score, 20, 30);
+            context.fillText('SCORE: ' + this.score, 20, 30);
             if (this.score >= this.maxScore) {
                 context.save();
                 context.textAlign = 'center';
-                context.fillText('WON! score: ' + this.score, this.width / 2, this.height / 2);
+                context.fillText('You won, reaching ' + this.score + ' points', this.width / 2, this.height / 2);
                 context.restore();
             }
         }
