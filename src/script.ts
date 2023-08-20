@@ -55,20 +55,25 @@ window.addEventListener('load', function() {
             if (!this.free){
                 this.angle += 0.001 + this.angleChange
                 this.x += this.speed
-                if (this.x > this.game.width + this.radius){
+                if (this.x > this.game.width - this.radius){
                     this.reset()
+                    const explosion = this.game.getExplosion()
+                    if (explosion) {
+                        explosion.start(this.x, this.y)
+                    }
                 }
             }
         }
 
         reset(){
             this.free = true
-            this.x = -this.radius
-            this.y = Math.random() * this.game.height
+
         }
 
         start(){
             this.free = false
+            this.x = -this.radius
+            this.y = Math.random() * this.game.height
         }
     }
 
@@ -84,6 +89,8 @@ window.addEventListener('load', function() {
         frameX: number
         frameY: number
         maxFrame: number
+        animationTimer: number
+        animationInterval: number
 
         constructor(game: Game){
             this.game = game
@@ -95,17 +102,29 @@ window.addEventListener('load', function() {
             this.spriteHeight = 300
             this.free = true
             this.frameX = 0
-            this.frameY = Math.floor(Math.random()*3)
+            this.frameY = Math.floor(Math.random()*30)
             this.maxFrame = 22
+            this.animationTimer = 0
+            this.animationInterval = 1000/25 //1000/70 -> about 60FPS of explo animation
         }
         draw(context: CanvasRenderingContext2D) {
             if (!this.free){
-                context.drawImage(this.image, this.x, this.y)
+                // context.drawImage(this.image, this.x, this.y)
+                context.drawImage(this.image, this.spriteWidth * this.frameX, this.spriteHeight * this.frameY, this.spriteWidth, this.spriteHeight, this.x - this.spriteWidth /2, this.y - this.spriteHeight /2, this.spriteWidth, this.spriteHeight)
             }
         }
-        update(){
+        update(deltaTime: number){
             if (!this.free){
-                
+                if (this.animationTimer > this.animationInterval){
+                    this.frameX++
+                    if (this.frameX > this.maxFrame) {
+                        this.reset()
+                    }
+                    this.animationTimer = 0
+                }
+                else {
+                    this.animationTimer += deltaTime
+                }
             }
         }
         reset(){
@@ -115,6 +134,8 @@ window.addEventListener('load', function() {
             this.free = false
             this.x = x
             this.y = y
+            this.frameX = 0
+            this.frameY = 0
         }
     }
 
@@ -141,15 +162,13 @@ window.addEventListener('load', function() {
             this.asteroidInterval = 1 //time limit
             this.createAsteroidPool()
             this.explosionPool = []
-            this.maxExplosions = 10 //can by a dynamic value
+            this.maxExplosions = 30 //can by a dynamic value
             this.createExplosionPool()
-
 
             this.mouse = {
                 x: 0,
                 y: 0
             }
-
 
             // Arrow function inherits 'this' keyword from the parents scope
             // 'this' will be inherited from a class it was defined in. 
@@ -171,7 +190,7 @@ window.addEventListener('load', function() {
         }
 
         createExplosionPool() {
-            for (let i = 0; i < this.maxAsteroids; i++) {
+            for (let i = 0; i < this.maxExplosions; i++) {
                 this.explosionPool.push(new Explosion(this))
             }
         }
@@ -210,7 +229,7 @@ window.addEventListener('load', function() {
             })
             this.explosionPool.forEach( explosion => {
                 explosion.draw(context)
-                explosion.update()
+                explosion.update(deltaTime)
             })
             // this.asteroid.draw(context)
         }
@@ -225,7 +244,7 @@ window.addEventListener('load', function() {
         lastTime = timeStamp
         ctx.clearRect(0,0, canvas.width, canvas.height)
         game.render(ctx, deltaTime)
-        // console.log(Math.floor(1000/deltaTime))
+        // console.log(Math.floor(1000/deltaTime)) //FPS
         requestAnimationFrame(animate)
     }
     //run animation loop, first time stamp as argument
