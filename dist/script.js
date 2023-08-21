@@ -42,11 +42,13 @@ window.addEventListener('load', function () {
             if (!this.free) {
                 this.angle += 0.001 + this.angleChange;
                 this.x += this.speed;
-                if (this.x > this.game.width - this.radius) {
+                // this.score < this.maxScore && this.score > Math.round(this.maxScore/2)
+                if (this.x > this.game.width - this.radius && this.game.score < this.game.maxScore && this.game.score > Math.round(-this.game.maxScore / 2)) {
                     this.reset();
                     const explosion = this.game.getExplosion();
                     if (explosion) {
                         explosion.start(this.x, this.y, this.speed * -0.2);
+                        this.game.score--;
                     }
                 }
             }
@@ -134,7 +136,7 @@ window.addEventListener('load', function () {
                 radius: 2,
             };
             this.explosionSound = document.getElementById('explosion5');
-            this.explosionSound.volume = 0.2; // volume lowered
+            this.explosionSound.volume = 0.1; // volume lowered
             this.createAsteroidPool();
             this.createExplosionPool();
             // console.log('this.explosionSound ' + this.explosionSound)
@@ -150,7 +152,7 @@ window.addEventListener('load', function () {
                         if (explosion) {
                             explosion.start(asteroid.x, asteroid.y, asteroid.speed * 0.4);
                             asteroid.reset();
-                            if (this.score < this.maxScore) {
+                            if (this.score < this.maxScore && this.score > Math.round(-this.maxScore / 2)) {
                                 this.score++;
                             }
                         }
@@ -217,6 +219,12 @@ window.addEventListener('load', function () {
                 context.save();
                 context.textAlign = 'center';
                 context.fillText('You won, reaching ' + this.score + ' points', this.width / 2, this.height / 2);
+                context.restore();
+            }
+            if (this.score <= Math.round(-this.maxScore / 2)) {
+                context.save();
+                context.textAlign = 'center';
+                context.fillText('Universe is quite dead.', this.width / 2, this.height / 2);
                 context.restore();
             }
         }
